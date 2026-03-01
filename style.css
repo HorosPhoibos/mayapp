@@ -2,14 +2,24 @@
     --pink-bg: #FFD1DC;
     --pink-card: #FFFFFF;
     --pink-accent: #FF85A2;
+    --pink-dark: #D81B60;
     --text-main: #4A4A4A;
     --pixel-border: 4px solid #000000;
+    --window-header: #FFB7C5;
 }
 
 * { box-sizing: border-box; }
 
+/* Efek Background Bintang Pixel & Scanline */
 body {
     background-color: var(--pink-bg);
+    background-image: 
+        radial-gradient(white 2px, transparent 0),
+        radial-gradient(white 2px, transparent 0),
+        linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.05) 50%),
+        linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.02));
+    background-size: 40px 40px, 40px 40px, 100% 3px, 3px 100%;
+    background-position: 0 0, 20px 20px, 0 0, 0 0;
     font-family: 'Press Start 2P', cursive;
     color: var(--text-main);
     margin: 0;
@@ -20,64 +30,151 @@ body {
 
 .container { max-width: 500px; margin: 0 auto; }
 
+/* REVISI CARD: Menjadi gaya "Window" Game */
 .card {
     background: var(--pink-card);
     border: var(--pixel-border);
-    border-radius: 12px;
-    padding: 12px;
-    margin-bottom: 15px;
-    box-shadow: 4px 4px 0px rgba(0,0,0,0.1);
+    border-radius: 0px; /* Pixel art lebih bagus tanpa radius besar */
+    padding: 15px 12px 12px 12px;
+    margin-bottom: 20px;
+    box-shadow: 6px 6px 0px rgba(0,0,0,0.2);
+    position: relative;
+    overflow: visible;
+}
+
+/* Ornamen Header Jendela */
+.card::before {
+    content: "■ ● ✖";
+    position: absolute;
+    top: -12px;
+    left: 10px;
+    background: var(--window-header);
+    border: var(--pixel-border);
+    padding: 2px 8px;
+    font-size: 6px;
+    color: white;
+}
+
+/* Ornamen Bintang Melayang di pojok Card */
+.card::after {
+    content: "★";
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    color: #FFD700;
+    font-size: 14px;
+    text-shadow: 2px 2px 0 #000;
+    animation: floating 2s infinite ease-in-out;
+}
+
+@keyframes floating {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
 }
 
 .header-section {
     background: #FFF0F5;
     border: var(--pixel-border);
-    border-radius: 12px;
-    padding: 12px;
-    margin-bottom: 15px;
+    border-radius: 0px;
+    padding: 15px;
+    margin-bottom: 20px;
+    box-shadow: 6px 6px 0px var(--pink-accent);
 }
 
 .header-row-top { display: flex; justify-content: space-between; align-items: center; }
-.title-area { display: flex; align-items: center; gap: 8px; }
+.title-area { display: flex; align-items: center; gap: 10px; }
 
+/* Avatar dengan border ganda agar lebih imut */
 .avatar-pixel {
-    width: 50px; height: 50px;
+    width: 54px; height: 54px;
     border: 3px solid #000;
+    outline: 3px solid white;
     background: #fff;
     object-fit: cover;
 }
 
-h1 { font-size: 10px; margin: 0; color: #000; }
-h2 { font-size: 8px; margin-bottom: 10px; color: var(--pink-accent); }
+h1 { font-size: 11px; margin: 0; color: #000; text-transform: uppercase; }
+h2 { 
+    font-size: 8px; 
+    margin-bottom: 15px; 
+    color: var(--pink-dark);
+    background: #FFECF1;
+    display: inline-block;
+    padding: 4px;
+}
 
+/* Tampilan Timer yang lebih bold */
 .timer-display {
-    font-size: 12px; text-align: center;
-    padding: 8px; background: #FFF0F5;
-    border-radius: 8px;
+    font-size: 14px; 
+    text-align: center;
+    padding: 12px; 
+    background: #000;
+    color: #00FF41; /* Warna hijau matrix/retro */
+    border: 2px solid var(--pink-accent);
 }
 
-.map-container { margin: 10px 0; border: 2px solid #000; border-radius: 8px; overflow: hidden; }
+.map-container { 
+    margin: 10px 0; 
+    border: 3px solid #000; 
+    box-shadow: 4px 4px 0 var(--pink-accent);
+}
 
-.travel-estimate { font-size: 7px; margin-bottom: 5px; color: #555; }
-#travel-time { color: var(--pink-accent); font-weight: bold; }
+.travel-estimate { font-size: 7px; margin-bottom: 8px; color: var(--pink-dark); font-weight: bold; }
+#travel-time { color: var(--pink-dark); background: #FFE4E1; padding: 2px; }
 
+/* Button dengan efek tekan (3D) */
 .btn-nav {
-    display: block; text-align: center;
-    background: #FFB347; color: #000;
-    text-decoration: none; border: var(--pixel-border);
-    padding: 10px; margin-top: 5px;
+    display: block; 
+    text-align: center;
+    background: #FFB347; 
+    color: #000;
+    text-decoration: none; 
+    border: var(--pixel-border);
+    padding: 12px; 
+    margin-top: 10px;
+    box-shadow: 0 4px 0 #8B4513;
+    transition: all 0.1s;
 }
 
-.weather-sub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px; }
-.weather-sub { display: flex; justify-content: space-between; border-bottom: 1px dashed #ddd; padding-bottom: 2px; }
+.btn-nav:active {
+    box-shadow: 0 0px 0 #8B4513;
+    transform: translateY(4px);
+}
 
-.tip-box { background: #fdf2f5; padding: 10px; border: 2px dashed var(--pink-accent); }
-.tip-text { font-size: 8px; line-height: 1.4; margin: 0; }
+.weather-sub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+.weather-sub { 
+    display: flex; 
+    justify-content: space-between; 
+    border-bottom: 2px dotted var(--pink-accent); 
+    padding-bottom: 4px;
+    font-size: 7px;
+}
 
-.chart-grid { display: flex; flex-direction: column; gap: 10px; }
-.news-scroll { max-height: 120px; overflow-y: auto; font-size: 7px; }
+.tip-box { 
+    background: #FFF9FA; 
+    padding: 12px; 
+    border: 2px solid var(--pink-accent); 
+    position: relative;
+}
+
+/* Ornamen hati kecil di kotak Tips */
+.tip-box::before {
+    content: "❤";
+    position: absolute;
+    bottom: 2px;
+    right: 5px;
+    color: var(--pink-accent);
+}
+
+.news-scroll { 
+    max-height: 120px; 
+    overflow-y: auto; 
+    font-size: 7px; 
+    scrollbar-width: thin;
+}
 
 @media (min-width: 480px) {
-    body { font-size: 9px; }
-    h1 { font-size: 12px; }
+    body { font-size: 10px; }
+    h1 { font-size: 14px; }
+    .card::after { font-size: 18px; }
 }
