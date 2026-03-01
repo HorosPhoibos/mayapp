@@ -37,8 +37,8 @@ updateWorkTimer();
 async function fetchRandomVerse() {
     const verseEl = document.getElementById('daily-verse');
     try {
-        // Tambahkan query parameter unik agar tidak terkena cache browser
-        const response = await fetch('alkitab.json?v=' + new Date().getTime());
+        // Cache-busting agar selalu acak saat refresh
+        const response = await fetch('alkitab.json?t=' + Date.now());
         const versesList = await response.json();
         
         if (versesList && versesList.length > 0) {
@@ -47,6 +47,7 @@ async function fetchRandomVerse() {
         }
     } catch (error) {
         console.error("Gagal memuat JSON:", error);
+        // Fallback jika file tidak ditemukan atau limit
         verseEl.innerText = `"Segala perkara dapat kutanggung di dalam Dia yang memberi kekuatan kepadaku. - Filipi 4:13" ✨`;
     }
 }
@@ -94,15 +95,28 @@ async function fetchWeatherAdvice() {
 }
 fetchWeatherAdvice();
 
-// 6. BERITA
+// 6. FIX BERITA (Dengan Fallback Jika Limit Tercapai)
 async function fetchNews() {
     const container = document.getElementById('newsContainer');
     try {
-        const res = await fetch(`https://gnews.io/api/v4/top-headlines?category=general&lang=id&country=id&max=3&apikey=330c4524949a323d82659df746a05672`);
+        const apikey = '330c4524949a323d82659df746a05672'; 
+        const url = `https://gnews.io/api/v4/top-headlines?category=general&lang=id&country=id&max=3&apikey=${apikey}`;
+
+        const res = await fetch(url);
         const data = await res.json();
-        if(data.articles) {
-            container.innerHTML = data.articles.map(n => `<div style="margin-bottom:8px;">• ${n.title}</div>`).join('');
+        
+        if (data.articles && data.articles.length > 0) {
+            container.innerHTML = data.articles.map(n => `
+                <div style="margin-bottom:8px;">
+                    <a href="${n.url}" target="_blank" style="text-decoration:none; color:#333;">• ${n.title}</a>
+                </div>
+            `).join('');
+        } else {
+            throw new Error('Limit reached or empty articles');
         }
-    } catch (e) { container.innerHTML = "Gagal memuat berita."; }
+    } catch (e) {
+        console.warn("Berita limit, menampilkan pesan cadangan.");
+        container.innerHTML = "<p style='color:#8B7D84;'>Berita sedang istirahat sebentar (API Limit). Cek lagi nanti ya May! 📰</p>";
+    }
 }
 fetchNews();
