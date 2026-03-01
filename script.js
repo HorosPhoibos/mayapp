@@ -1,7 +1,11 @@
+// ASET GAMBAR
+const birdImg = new Image();
+birdImg.src = 'flappymay.png'; 
+
 // 1. JAM REAL-TIME
 function updateClock() {
-    const now = new Date();
-    document.getElementById('clock').innerText = now.toLocaleTimeString('id-ID', { hour12: false });
+    const clock = document.getElementById('clock');
+    if (clock) clock.innerText = new Date().toLocaleTimeString('id-ID', { hour12: false });
 }
 setInterval(updateClock, 1000);
 updateClock();
@@ -9,114 +13,102 @@ updateClock();
 // 2. LOGIKA KERJA
 function updateWorkTimer() {
     const now = new Date();
-    const day = now.getDay(); 
-    const hour = now.getHours();
-    const timerElement = document.getElementById('countdown');
-
-    if (day === 0 || (day === 6 && hour >= 12)) {
-        timerElement.innerText = "WEEKEND! 🥂";
-        return;
+    const timer = document.getElementById('countdown');
+    if (!timer) return;
+    if (now.getDay() === 0 || (now.getDay() === 6 && now.getHours() >= 12)) {
+        timer.innerText = "WAKTU WEEKEND 🥂"; return;
     }
-
+    const end = new Date(); end.setHours(17, 30, 0, 0);
     const start = new Date(); start.setHours(8, 0, 0, 0);
-    const end = new Date(); end.setHours(17, 30, 0, 0); 
-
     if (now >= start && now <= end) {
         let diff = end - now;
         const h = Math.floor(diff / 3600000).toString().padStart(2, '0');
         const m = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
-        timerElement.innerText = `${h}:${m} LAGI`;
-    } else {
-        timerElement.innerText = now > end ? "ISTIRAHAT 🌙" : "KOPI DULU ☕";
-    }
+        const s = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+        timer.innerText = `${h}:${m}:${s}`;
+    } else { timer.innerText = now > end ? "WAKTUNYA ISTIRAHAT 🌙" : "BELUM JAM KERJA ☕"; }
 }
-setInterval(updateWorkTimer, 60000);
+setInterval(updateWorkTimer, 1000);
 updateWorkTimer();
 
-// 3. FIX: AYAT ALKITAB RANDOM DARI JSON
+// 3. AYAT ALKITAB RANDOM
 async function fetchRandomVerse() {
     const verseEl = document.getElementById('daily-verse');
     try {
-        // Cache-busting agar selalu acak saat refresh
-        const response = await fetch('alkitab.json?t=' + Date.now());
+        const response = await fetch('alkitab.json?v=' + Date.now());
         const versesList = await response.json();
-        
-        if (versesList && versesList.length > 0) {
-            const randomIndex = Math.floor(Math.random() * versesList.length);
-            verseEl.innerText = `"${versesList[randomIndex]}" ✨`;
+        if (versesList.length > 0) {
+            verseEl.innerText = `"${versesList[Math.floor(Math.random() * versesList.length)]}" ✨`;
         }
-    } catch (error) {
-        console.error("Gagal memuat JSON:", error);
-        // Fallback jika file tidak ditemukan atau limit
+    } catch (e) {
         verseEl.innerText = `"Segala perkara dapat kutanggung di dalam Dia yang memberi kekuatan kepadaku. - Filipi 4:13" ✨`;
     }
 }
 fetchRandomVerse();
 
-// 4. NAVIGASI (Lokasi Kantor Setu)
-function setupCommute() {
-    const navBtn = document.getElementById('nav-btn');
-    const destLat = -6.331238; 
-    const destLng = 106.677815;
+// 4. GAME FLAPPY MAY
+const canvas = document.getElementById('flappyCanvas');
+const ctx = canvas.getContext('2d');
+let birdY = 200, birdV = 0, pipes = [], frame = 0, score = 0, isGameOver = false;
 
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition((pos) => {
-            const lat = pos.coords.latitude;
-            const lng = pos.coords.longitude;
-            navBtn.href = `https://www.google.com/maps/dir/?api=1&origin=${lat},${lng}&destination=${destLat},${destLng}&travelmode=driving`;
-        }, () => {
-            navBtn.href = `https://www.google.com/maps/search/?api=1&query=${destLat},${destLng}`;
-        });
+function drawBird() { ctx.drawImage(birdImg, 50, birdY, 30, 30); }
+
+function updateGame() {
+    if (isGameOver) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#70c5ce'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    birdV += 0.4; birdY += birdV;
+    if (birdY > canvas.height - 30 || birdY < 0) endGame();
+    if (frame % 100 === 0) {
+        let gap = 120, top = Math.random() * (canvas.height - gap - 100) + 50;
+        pipes.push({ x: canvas.width, top: top, bottom: canvas.height - top - gap });
     }
+    pipes.forEach(p => {
+        p.x -= 2;
+        ctx.fillStyle = '#FFB7C5';
+        ctx.fillRect(p.x, 0, 40, p.top);
+        ctx.fillRect(p.x, canvas.height - p.bottom, 40, p.bottom);
+        if (p.x < 80 && p.x > 20 && (birdY < p.top || birdY > canvas.height - p.bottom)) endGame();
+        if (p.x === 50) score++;
+    });
+    pipes = pipes.filter(p => p.x > -40);
+    drawBird();
+    ctx.fillStyle = '#000'; ctx.fillText("SKOR: " + score, 10, 25);
+    frame++; requestAnimationFrame(updateGame);
 }
-setupCommute();
 
-// 5. TIPS CUACA & UPDATE SUHU
-async function fetchWeatherAdvice() {
+function jump() { if (!isGameOver) birdV = -6; }
+function endGame() { isGameOver = true; document.getElementById('game-over-overlay').style.display = 'block'; document.getElementById('final-score').innerText = score; }
+function resetGame() { birdY = 200; birdV = 0; pipes = []; score = 0; frame = 0; isGameOver = false; document.getElementById('game-over-overlay').style.display = 'none'; updateGame(); }
+canvas.addEventListener('mousedown', jump);
+canvas.addEventListener('touchstart', (e) => { e.preventDefault(); jump(); });
+
+// 5. CUACA & NAVIGASI
+async function fetchWeather() {
     const adviceEl = document.getElementById('weather-advice');
     const tempEl = document.getElementById('current-temp');
     try {
         const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-6.20&longitude=106.84&current_weather=true&daily=weathercode,temperature_2m_max&timezone=Asia%2FJakarta');
         const data = await res.json();
-        
         tempEl.innerText = `${Math.round(data.current_weather.temperature)}° 🌤️`;
-
-        const tomorrowCode = data.daily.weathercode[1];
-        const maxTemp = data.daily.temperature_2m_max[1];
-        
-        let message = "Besok cuaca bagus, tetap semangat ya May! ✨";
-        if (tomorrowCode > 3) {
-            message = "Besok bakal hujan, jangan lupa sedia payung ya May! ☔";
-        } else if (maxTemp > 33) {
-            message = "Besok panas sekalii, pakai sunscreen ya biar kulit aman! ☀️";
-        }
-        adviceEl.innerText = message;
+        const code = data.daily.weathercode[1];
+        adviceEl.innerText = code > 3 ? "Besok bakal hujan, jangan lupa bawa payung ya May! ☔" : "Besok cuaca bagus, tetap semangat ya May! ✨";
     } catch (e) { adviceEl.innerText = "Cek cuaca besok ya May! ✨"; }
 }
-fetchWeatherAdvice();
+fetchWeather();
 
-// 6. FIX BERITA (Dengan Fallback Jika Limit Tercapai)
+const destLat = -6.3312, destLng = 106.6778; // Alamat kantor baru Setu
+document.getElementById('nav-btn').href = `https://www.google.com/maps/dir/?api=1&destination=${destLat},${destLng}`;
+
+// 6. BERITA
 async function fetchNews() {
     const container = document.getElementById('newsContainer');
     try {
-        const apikey = '330c4524949a323d82659df746a05672'; 
-        const url = `https://gnews.io/api/v4/top-headlines?category=general&lang=id&country=id&max=3&apikey=${apikey}`;
-
+        const url = `https://gnews.io/api/v4/top-headlines?category=general&lang=id&country=id&max=3&apikey=330c4524949a323d82659df746a05672`;
         const res = await fetch(url);
         const data = await res.json();
-        
-        if (data.articles && data.articles.length > 0) {
-            container.innerHTML = data.articles.map(n => `
-                <div style="margin-bottom:8px;">
-                    <a href="${n.url}" target="_blank" style="text-decoration:none; color:#333;">• ${n.title}</a>
-                </div>
-            `).join('');
-        } else {
-            throw new Error('Limit reached or empty articles');
-        }
-    } catch (e) {
-        console.warn("Berita limit, menampilkan pesan cadangan.");
-        container.innerHTML = "<p style='color:#8B7D84;'>Berita sedang istirahat sebentar (API Limit). Cek lagi nanti ya May! 📰</p>";
-    }
+        if(data.articles) { container.innerHTML = data.articles.map(n => `<div style="margin-bottom:8px;">• ${n.title}</div>`).join(''); }
+    } catch (e) { container.innerHTML = "Gagal memuat berita."; }
 }
 fetchNews();
+updateGame();

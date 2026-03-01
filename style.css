@@ -10,7 +10,7 @@
 
 * { box-sizing: border-box; }
 
-/* Efek Background Bintang Pixel & Scanline */
+/* Background Bintang & Scanline Retro */
 body {
     background-color: var(--pink-bg);
     background-image: 
@@ -30,19 +30,18 @@ body {
 
 .container { max-width: 500px; margin: 0 auto; }
 
-/* REVISI CARD: Menjadi gaya "Window" Game */
+/* Jendela Kartu Gaya RPG */
 .card {
     background: var(--pink-card);
     border: var(--pixel-border);
-    border-radius: 0px; /* Pixel art lebih bagus tanpa radius besar */
+    border-radius: 0px; 
     padding: 15px 12px 12px 12px;
     margin-bottom: 20px;
     box-shadow: 6px 6px 0px rgba(0,0,0,0.2);
     position: relative;
-    overflow: visible;
 }
 
-/* Ornamen Header Jendela */
+/* Ornamen Tombol Jendela di Atas Kartu */
 .card::before {
     content: "■ ● ✖";
     position: absolute;
@@ -55,7 +54,7 @@ body {
     color: white;
 }
 
-/* Ornamen Bintang Melayang di pojok Card */
+/* Bintang Melayang di Pojok Kartu */
 .card::after {
     content: "★";
     position: absolute;
@@ -75,7 +74,6 @@ body {
 .header-section {
     background: #FFF0F5;
     border: var(--pixel-border);
-    border-radius: 0px;
     padding: 15px;
     margin-bottom: 20px;
     box-shadow: 6px 6px 0px var(--pink-accent);
@@ -84,7 +82,6 @@ body {
 .header-row-top { display: flex; justify-content: space-between; align-items: center; }
 .title-area { display: flex; align-items: center; gap: 10px; }
 
-/* Avatar dengan border ganda agar lebih imut */
 .avatar-pixel {
     width: 54px; height: 54px;
     border: 3px solid #000;
@@ -93,88 +90,89 @@ body {
     object-fit: cover;
 }
 
-h1 { font-size: 11px; margin: 0; color: #000; text-transform: uppercase; }
+h1 { font-size: 11px; margin: 0; color: #000; }
 h2 { 
-    font-size: 8px; 
-    margin-bottom: 15px; 
-    color: var(--pink-dark);
-    background: #FFECF1;
-    display: inline-block;
-    padding: 4px;
+    font-size: 8px; margin-bottom: 15px; color: var(--pink-dark);
+    background: #FFECF1; display: inline-block; padding: 4px;
 }
 
-/* Tampilan Timer yang lebih bold */
 .timer-display {
-    font-size: 14px; 
-    text-align: center;
-    padding: 12px; 
-    background: #000;
-    color: #00FF41; /* Warna hijau matrix/retro */
-    border: 2px solid var(--pink-accent);
+    font-size: 12px; text-align: center; padding: 12px; 
+    background: #000; color: #00FF41; border: 2px solid var(--pink-accent);
 }
 
-.map-container { 
-    margin: 10px 0; 
-    border: 3px solid #000; 
-    box-shadow: 4px 4px 0 var(--pink-accent);
-}
-
-.travel-estimate { font-size: 7px; margin-bottom: 8px; color: var(--pink-dark); font-weight: bold; }
-#travel-time { color: var(--pink-dark); background: #FFE4E1; padding: 2px; }
-
-/* Button dengan efek tekan (3D) */
 .btn-nav {
-    display: block; 
-    text-align: center;
-    background: #FFB347; 
-    color: #000;
-    text-decoration: none; 
-    border: var(--pixel-border);
-    padding: 12px; 
-    margin-top: 10px;
-    box-shadow: 0 4px 0 #8B4513;
-    transition: all 0.1s;
+    display: block; text-align: center; background: #FFB347; 
+    color: #000; text-decoration: none; border: var(--pixel-border);
+    padding: 12px; margin-top: 10px; box-shadow: 0 4px 0 #8B4513;
 }
 
-.btn-nav:active {
-    box-shadow: 0 0px 0 #8B4513;
-    transform: translateY(4px);
+.btn-nav:active { transform: translateY(4px); box-shadow: none; }
+
+.game-container {
+    position: relative; display: inline-block; border: 3px solid #000;
+    background: #70c5ce; cursor: pointer; max-width: 100%;
 }
 
-.weather-sub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
-.weather-sub { 
-    display: flex; 
-    justify-content: space-between; 
-    border-bottom: 2px dotted var(--pink-accent); 
-    padding-bottom: 4px;
-    font-size: 7px;
+#flappyCanvas { display: block; max-width: 100%; height: auto; }
+
+.overlay {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.95); border: var(--pixel-border);
+    padding: 20px; text-align: center; z-index: 10;
 }
 
 .tip-box { 
-    background: #FFF9FA; 
-    padding: 12px; 
-    border: 2px solid var(--pink-accent); 
-    position: relative;
+    background: #FFF9FA; padding: 12px; border: 2px dashed var(--pink-accent);
 }
 
-/* Ornamen hati kecil di kotak Tips */
-.tip-box::before {
-    content: "❤";
-    position: absolute;
-    bottom: 2px;
-    right: 5px;
-    color: var(--pink-accent);
+.weather-sub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+.weather-sub { display: flex; justify-content: space-between; border-bottom: 2px dotted #eee; padding-bottom: 4px; }
+
+@media (min-width: 480px) { body { font-size: 9px; } h1 { font-size: 13px; } }
+
+/* Pastikan container utama benar-benar center */
+.container { 
+    max-width: 500px; 
+    margin: 0 auto; 
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Biar semua card di dalamnya ikut center */
+    width: 100%;
 }
 
-.news-scroll { 
-    max-height: 120px; 
-    overflow-y: auto; 
-    font-size: 7px; 
-    scrollbar-width: thin;
+/* Bikin semua card memenuhi lebar container */
+.card, .header-section {
+    width: 100%; 
+    text-align: center; /* Judul h2 jadi otomatis di tengah */
 }
 
-@media (min-width: 480px) {
-    body { font-size: 10px; }
-    h1 { font-size: 14px; }
-    .card::after { font-size: 18px; }
+/* Pusatkan isi Header (Foto & Nama) */
+.header-row-top { 
+    display: flex; 
+    flex-direction: column; /* Ubah ke kolom supaya tumpuk tengah */
+    align-items: center; 
+    gap: 15px;
+    text-align: center;
+}
+
+.title-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Pastikan Game Box ada di tengah */
+.game-container {
+    display: block;
+    margin: 0 auto; /* Teknik maut buat centering */
+    max-width: 100%;
+}
+
+/* Pusatkan Judul di tiap Card */
+h2 {
+    display: block;
+    text-align: center;
+    margin: 0 auto 15px auto;
 }
